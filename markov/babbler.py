@@ -112,8 +112,23 @@ class Babbler:
         special symbol 'EOL' in the state transition table. 'EOL' is short for 'end of line'; since it is capitalized and all our input texts are lower-case, it will be unambiguous.
         """
 
-        pass #The pass statement is used as a placeholder for future code. When the pass statement is executed, nothing happens, but you avoid getting an error when empty code is not allowed. Empty code is not allowed in loops, function definitions, class definitions, or in if statements.
+        words = sentence.split()
+        if len(words) < self.n:
+            return
+        
+        starterNgram = ' '.join(words[:self.n])
+        self.starters.append(starterNgram)
 
+        for i in range(len(words) - self.n + 1):
+            ngram = ' '.join(words[i:i + self.n])
+            nextWord = words[i + self.n] 
+            if i + self.n < len(words):
+
+                if ngram not in self.brainGraph:
+                    self.brainGraph[ngram] = []
+            self.brainGraph[ngram].append(nextWord)
+        stopperNgram = ' '.join(words[-self.n:])
+        self.stoppers.append(stopperNgram)
 
     def get_starters(self):
         """
@@ -121,7 +136,8 @@ class Babbler:
         The resulting list may contain duplicates, because one n-gram may start
         multiple sentences. Probably a one-line method.
         """
-        pass
+        return self.starters
+        
     
 
     def get_stoppers(self):
@@ -130,7 +146,8 @@ class Babbler:
         The resulting value may contain duplicates, because one n-gram may stop
         multiple sentences. Probably a one-line method.
         """
-        pass
+        return self.stoppers
+        
 
 
     def get_successors(self, ngram):
@@ -145,8 +162,8 @@ class Babbler:
         If n=3, then the n-gram 'the dog dances' is followed by 'quickly' one time, and 'with' two times.
         If the given state never occurs, return an empty list.
         """
-
-        pass
+        return self.brainGraph.get(ngram, [])
+        
     
 
     def get_all_ngrams(self):
@@ -154,8 +171,8 @@ class Babbler:
         Return all the possible n-grams (sequences of n words), that we have seen across all sentences.
         Probably a one-line method.
         """
-
-        pass
+        return list(self.brainGraph.keys())
+        
 
     
     def has_successor(self, ngram):
@@ -165,8 +182,8 @@ class Babbler:
         because ngrams with no successor words must not have occurred in the training sentences.
         Probably a one-line method.
         """
-
-        pass
+        return ngram in self.brainGraph
+        
     
     
     def get_random_successor(self, ngram):
@@ -180,8 +197,11 @@ class Babbler:
         and we call get_random_next_word() for the state 'the dog dances',
         we should get 'quickly' about 1/3 of the time, and 'with' 2/3 of the time.
         """
-
-        pass
+        successor = self.get_successors(ngram) 
+        if not successor:
+            return None
+        return random.choice(successor)
+        
     
 
     def babble(self):
@@ -198,8 +218,22 @@ class Babbler:
             Our example state is now: 'b c d' 
         6: Repeat from step 2.
         """
+         if not self.starters:
+            return ''
+        
+        currentNgram = random.choice(self.starters) 
+        sentence = currentNgram
 
-        pass
+        while True:
+            successor = self.get_random_successor(currentNgram)
+            if successor == 'EOL':
+                return sentence
+            
+            sentence = ' ' + successor
+            currentNgramWords = currentNgram.spilt()[1:] + [successor]
+            currentNgram = ' '.join(currentNgramWords)
+        #the auto grader was not working and I could not get the interesting sentences out. 
+        
             
 
 # nothing to change here; read, understand, move along
